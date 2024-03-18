@@ -31,7 +31,6 @@ export default function IconBreadcrumbs(props) {
                                 }`}
                                 to={item.url}
                             >
-                                {/* {item.icon} */}
                                 {item.title}
                             </Link>
                         )

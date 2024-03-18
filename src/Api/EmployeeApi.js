@@ -40,7 +40,7 @@ export const PutEmployeeApi = async (body) => {
 
 export const DeleteEmployeeApi = async (id) => {
     try {
-        const response = await axios.delete(`${API_URL}/Employees/${id}`)
+        const response = await axios.delete(`${API_URL}/Employee/${id}`)
         return response.data
     } catch (error) {
         throw error

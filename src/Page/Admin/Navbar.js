@@ -10,6 +10,7 @@ import Settings from '@mui/icons-material/Settings'
 import { Link, NavLink } from 'react-router-dom'
 import TuneIcon from '@mui/icons-material/Tune'
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined'
+import WifiIcon from '@mui/icons-material/Wifi'
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import KeyIcon from '@mui/icons-material/Key'
@@ -54,16 +55,16 @@ export default function NavbarAdmin() {
     const userString = localStorage.getItem('role')
     const userObject = JSON.parse(userString)
     useEffect(() => {
-        if (userObject && userObject == 'Manager') {
-            history.push('/Manager/Employee')
-        } else if (userObject && userObject == 'User') {
-            history.push('/Employee/Dashboard')
-        } else if (userObject && userObject == 'HR') {
-            history.push('/Hr/ManageLeave')
-        } else if (userObject && userObject == 'Admin') {
-        } else {
-            history.push('')
-        }
+        // if (userObject && userObject == 'Manager') {
+        //     history.push('/Manager/Employee')
+        // } else if (userObject && userObject == 'User') {
+        //     history.push('/Employee/Dashboard')
+        // } else if (userObject && userObject == 'HR') {
+        //     history.push('/Hr/ManageLeave')
+        // } else if (userObject && userObject == 'Admin') {
+        // } else {
+        //     history.push('')
+        // }
     }, [])
     let history = useHistory()
     const handleCloseOut = () => {
@@ -136,7 +137,7 @@ export default function NavbarAdmin() {
                                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700 group"
                             >
                                 <GroupOutlinedIcon className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 " />
-                                <span className="flex-1 ml-3 whitespace-nowrap">Department</span>
+                                <span className="flex-1 ml-3 whitespace-nowrap">Team</span>
                             </Link>
                         </li>
                         <li className="cursor-pointer p-2">
@@ -146,6 +147,16 @@ export default function NavbarAdmin() {
                             >
                                 <BadgeIcon className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 " />
                                 <span className="flex-1 ml-3 whitespace-nowrap">Employee</span>
+                            </Link>
+                        </li>
+
+                        <li className="cursor-pointer p-2">
+                            <Link
+                                to="/Admin/Wifi"
+                                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700 group"
+                            >
+                                <WifiIcon className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 " />
+                                <span className="flex-1 ml-3 whitespace-nowrap">Wifi</span>
                             </Link>
                         </li>
                         {/* <li className="cursor-pointer p-2">
@@ -226,7 +237,7 @@ export default function NavbarAdmin() {
                                     ></path>
                                 </svg>
                             </button>
-                            <Link to="/" className="flex ml-2 md:mr-24 cursor-pointer">
+                            <Link to="/Admin/Team" className="flex ml-2 md:mr-24 cursor-pointer">
                                 <img
                                     src="https://t4.ftcdn.net/jpg/03/14/20/15/360_F_314201503_drLthBSHdqSBwBOGo8AHreHIGnfLEUJi.jpg"
                                     className="h-12 mr-3"
@@ -236,34 +247,6 @@ export default function NavbarAdmin() {
                                     Time Keeping
                                 </span>
                             </Link>
-                            <div className="hidden lg:block ">
-                                <label htmlFor="topbar-search" className="sr-only">
-                                    Search
-                                </label>
-                                <div className="relative mt-1 lg:w-96">
-                                    <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                                        <svg
-                                            className="w-5 h-5 text-gray-500 dark:text-gray-400"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                                clipRule="evenodd"
-                                            ></path>
-                                        </svg>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="email"
-                                        id="topbar-search"
-                                        className="bg-gray-50 outline-none border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder="Search Page"
-                                    />
-                                </div>
-                            </div>
                         </div>
 
                         <div className="flex items-center">
@@ -323,11 +306,8 @@ export default function NavbarAdmin() {
                                     </div>
                                     <hr className="mb-2" />
 
-                                    <MenuItem>
-                                        <NavLink to="/Profile" className="flex items-center">
-                                            {' '}
-                                            <Avatar /> Profile
-                                        </NavLink>
+                                    <MenuItem onClick={handleClickOpenAdd}>
+                                        <Avatar /> Profile
                                     </MenuItem>
                                     <Divider />
 
@@ -380,7 +360,7 @@ export default function NavbarAdmin() {
                                 }}
                             >
                                 <GroupOutlinedIcon className="ml-7 flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 " />
-                                <span className="ml-3">Department</span>
+                                <span className="ml-3">Team</span>
                             </NavLink>
                         </li>
                         <li className="cursor-pointer text-center mx-auto justify-center items-center">
@@ -393,6 +373,18 @@ export default function NavbarAdmin() {
                             >
                                 <BadgeIcon className="ml-7 flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 " />
                                 <span className="ml-3">Employee</span>
+                            </NavLink>
+                        </li>
+                        <li className="cursor-pointer text-center mx-auto justify-center items-center">
+                            <NavLink
+                                to="/Admin/Wifi"
+                                className="flex items-center gap-2 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-blue-100 dark:hover:bg-gray-700 group"
+                                activeStyle={{
+                                    background: '#dbeafe',
+                                }}
+                            >
+                                <WifiIcon className="ml-7 flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 " />
+                                <span className="ml-3">Wifi</span>
                             </NavLink>
                         </li>
                         {/* <li className="cursor-pointer text-center mx-auto justify-center items-center">

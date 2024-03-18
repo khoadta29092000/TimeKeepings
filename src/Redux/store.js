@@ -11,6 +11,7 @@ import WorkedSlice from './Worked/WorkedSlice'
 import AccountSlice from './Account/AccountSlice'
 import WorkSlotEmployeeSlice from './WorkSlotEmployee/WorkSlotEmployeeSlice'
 import SettingSlice from './Setting/SettingSlice'
+import wifiSlice from './Wifi/wifiSlice'
 
 export const store = configureStore({
     reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
         account: AccountSlice,
         WorkSlotEmployee: WorkSlotEmployeeSlice,
         setting: SettingSlice,
+        wifi: wifiSlice,
     },
     middleware: [thunk],
 })

@@ -24,6 +24,8 @@ import ManageOvertime from './Page/Manager/ManageOvertime/ManageOvertime'
 import ManageWorked from './Page/Manager/ManageWorked/ManageWorked'
 import DashboardEmployee from './Page/Employee/Dashboard/Dashboard'
 import WorkSlot from './Page/Manager/WorkSlot/WorkSlot'
+import Wifi from './Page/Admin/Wifi/Wifi'
+import GenerationData from './Page/GenerationData/GenerationData'
 
 export const history = createBrowserHistory()
 
@@ -35,6 +37,7 @@ function App() {
                 {/*Admin*/}
                 <Route path="/Admin/Team" exact component={Team} />
                 <Route path="/Admin/Employee" exact component={EmployeeAdmin} />
+                <Route path="/Admin/Wifi" exact component={Wifi} />
                 {/* <Route path="/Admin/RiskEmployeeSettings" exact component={RiskEmployeeSettings} /> */}
                 <Route path="/Admin/TrackSettings" exact component={TrackSettings} />
                 {/*Manager*/}
@@ -44,18 +47,25 @@ function App() {
                 <Route path="/Manager/RiskEmployee" exact component={RiskEmployee} />
                 <Route path="/Manager/TimeSheet" exact component={TimeSheet} />
                 <Route path="/Manager/Report" exact component={Report} />
+                <Route path="/Manager/ManageLeave" exact component={ManageLeave} />
+                <Route path="/Manager/ManageHoliday" exact component={Holiday} />
+                <Route path="/Manager/ManageOvertime" exact component={ManageOvertime} />
+                <Route path="/Manager/ManageWorked" exact component={ManageWorked} />
                 {/*HR*/}
                 <Route path="/Hr/Workslot" exact component={WorkSlot} />
                 <Route path="/Hr/ManageLeave" exact component={ManageLeave} />
                 <Route path="/Hr/ManageHoliday" exact component={Holiday} />
                 <Route path="/Hr/ManageOvertime" exact component={ManageOvertime} />
                 <Route path="/Hr/ManageWorked" exact component={ManageWorked} />
+                <Route path="/Hr/TimeSheet" exact component={TimeSheet} />
                 {/*Employee*/}
 
                 <Route path="/Employee/Dashboard" exact component={DashboardEmployee} />
                 <Route path="/Employee/ApplyLeave" exact component={ApplyLeave} />
                 <Route path="/Employee/Overtime" exact component={Overtime} />
                 <Route path="/Employee/Worked" exact component={Worked} />
+                {/* Data */}
+                <Route path="/GenerationData" exact component={GenerationData} />
                 <Route component={ErrorPage} />
             </Switch>
         </Router>

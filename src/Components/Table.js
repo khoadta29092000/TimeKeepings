@@ -56,11 +56,11 @@ export default function TableData(props) {
                                         src="https://firebasestorage.googleapis.com/v0/b/carmanaager-upload-file.appspot.com/o/images%2Fdownload.svg2561bc28-0cfc-4d75-b183-00387dc91474?alt=media&token=cc09aed8-ccd7-4d8a-ba3c-0b4ace899f40"
                                         className="h-52 w-52 mx-auto "
                                     />
-                                    <div class="mx-auto max-w-screen-sm text-center mt-8 mb-8 lg:mb-16">
-                                        <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
+                                    <div className="mx-auto max-w-screen-sm text-center mt-8 mb-8 lg:mb-16">
+                                        <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
                                             No Result
                                         </h2>
-                                        <p class="font-light text-gray-500 lg:mb-16 sm:text-xl dark:text-gray-400">
+                                        <p className="font-light text-gray-500 lg:mb-16 sm:text-xl dark:text-gray-400">
                                             There is no data yet or you can search for another value
                                         </p>
                                     </div>

@@ -20,7 +20,7 @@ export const GetDepartmentWithoutApi = async () => {
 }
 export const GetDepartmentByIdApi = async (id) => {
     try {
-        const response = await axios.get(`${API_URL}/Department/${id}`)
+        const response = await axios.get(`${API_URL}/Department/get-all-employee-in-department-id?departmentId=${id}`)
         return response.data
     } catch (error) {
         throw error

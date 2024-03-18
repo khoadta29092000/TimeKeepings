@@ -134,6 +134,14 @@ export default function Holiday() {
         validationSchema: Yup.object({
             holidayDescription: Yup.string().required(),
             holidayTitle: Yup.string().required(),
+            holidayDate: Yup.date().required(),
+
+            holidayDateEnd: Yup.date()
+                .required()
+
+                .when('holidayDate', (holidayDate, schema) => {
+                    return schema.min(holidayDate, 'End Date must be after Start Date')
+                }),
         }),
         onSubmit: (values) => {
             const idArray = selectedUser.map((item) => item.id)
@@ -469,7 +477,7 @@ export default function Holiday() {
             title: item.holidayName,
         }))
     }
-    console.log('ngu', selectedUser)
+    console.log('ngu', formik.errors, formik.touched)
     const [value, setValue] = useState([])
     const rows = createRows()
     const viewModalContent = (
@@ -495,6 +503,9 @@ export default function Holiday() {
                                 min: today.toISOString().split('T')[0], // Chặn ngày từ quá khứ
                             }}
                         />
+                        {formik.errors.holidayDate && formik.touched.holidayDate && (
+                            <div className="text mt-1 text-red-600 font-semibold">{formik.errors.holidayDate}</div>
+                        )}
                     </div>
                     <div className="my-4">
                         <div className="mb-2">
@@ -515,6 +526,9 @@ export default function Holiday() {
                                 min: today.toISOString().split('T')[0], // Chặn ngày từ quá khứ
                             }}
                         />
+                        {formik.errors.holidayDateEnd && formik.touched.holidayDateEnd && (
+                            <div className="text mt-1 text-red-600 font-semibold">{formik.errors.holidayDateEnd}</div>
+                        )}
                     </div>
                     <div className="my-4">
                         <div className="mb-2">
@@ -655,9 +669,28 @@ export default function Holiday() {
         </Fragment>
     )
     console.log('fileInputRef', fileInputRef)
+    const [userRole, setUserRole] = useState(() => {
+        const userString = localStorage.getItem('role')
+        const userObject = JSON.parse(userString)
+        return userObject || 'defaultRole' // Provide a default role if undefined
+    })
+    useEffect(() => {
+        // Update the userRole state whenever 'role' is changed in localStorage
+        const handleStorageChange = () => {
+            const userString = localStorage.getItem('role')
+            const userObject = JSON.parse(userString)
+            setUserRole(userObject || 'defaultRole')
+        }
+
+        window.addEventListener('storage', handleStorageChange)
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange)
+        }
+    }, [])
     return (
         <div>
-            <NavbarHR />
+             {userRole === 'Manager' ? <Navbar /> : <NavbarHR />}
             <PopupConfirm open={openConfirm} clickOpenFalse={clickOpenFalseConfirm} clickDelete={handleDelete} />
             <PopupData
                 open={open}

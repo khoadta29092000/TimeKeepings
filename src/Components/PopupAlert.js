@@ -52,15 +52,11 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 }
 
-export default function PopupConfirm(props) {
-    const { open, clickOpenFalse, clickDelete } = props
+export default function PopupAlert(props) {
+    const { open, clickOpenFalse, onClose } = props
 
     const handleClose = () => {
         clickOpenFalse(false)
-    }
-
-    const handleDelete = () => {
-        clickDelete()
     }
 
     return (
@@ -68,7 +64,7 @@ export default function PopupConfirm(props) {
             <BootstrapDialog
                 onClose={handleClose}
                 aria-labelledby="customized-dialog-title"
-                open={open == true ? true : false}
+                open={open}
                 fullWidth
                 maxWidth="xs"
                 TransitionComponent={Transition}
@@ -79,18 +75,17 @@ export default function PopupConfirm(props) {
                 }}
             >
                 <BootstrapDialogTitle className="text-gray-400" id="customized-dialog-title" onClose={handleClose}>
-                    Delete Confirm
+                    Delete Alert
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-                    <h2 className="font-bold text-xl">Are you sure to delete this ?</h2>
-                    <p className="mb-5 text-gray-400">You can't undo this action once you deleted this.</p>
+                    <h2 className="font-bold text-xl">This data cannot currently be deleted</h2>
+                    <p className="mb-5 text-gray-400">
+                        You can't delete because its status has been completed or rejected.
+                    </p>
                 </DialogContent>
                 <DialogActions className="my-2">
                     <Button variant="contained" color="inherit" onClick={handleClose}>
                         Cancel
-                    </Button>
-                    <Button variant="contained" color="error" onClick={handleDelete}>
-                        Delete
                     </Button>
                 </DialogActions>
             </BootstrapDialog>

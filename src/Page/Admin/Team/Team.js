@@ -48,6 +48,7 @@ import {
     PostDepartmentAsyncApi,
     PutDepartmentAsyncApi,
     getDepartmentAsyncApi,
+    getDepartmentByIdAsyncApi,
 } from '../../../Redux/Department/DepartmentSlice'
 import { getEmployeeAsyncApi } from '../../../Redux/Employee/employeeSlice'
 import { DeleteDepartmentApi } from '../../../Api/DepartmentApi'
@@ -57,14 +58,20 @@ import { DeleteDepartmentApi } from '../../../Api/DepartmentApi'
 const columns = [
     { id: 'number', label: 'Number', minWidth: 50, align: 'center' },
     { id: 'info', label: 'Name', minWidth: 200, align: 'left' },
-    // { id: 'manager', label: 'Manager', minWidth: 200, align: 'center' },
+    { id: 'manager', label: 'Manager', minWidth: 200, align: 'center' },
     { id: 'action', label: 'Actions', minWidth: 50, align: 'center' },
+]
+const columnsModal = [
+    { id: 'number', label: 'Number', minWidth: 50, maxWidth: 50, align: 'center' },
+    { id: 'email', label: 'Email', minWidth: 50, maxWidth: 100, align: 'left' },
+    { id: 'info', label: 'Name', minWidth: 50, maxWidth: 100, align: 'left' },
+    // { id: 'manager', label: 'Manager', minWidth: 200, align: 'center' },
 ]
 
 const breadcrumbIcons = () => {
     const data = [
         { title: 'Dashboard', icon: <DashboardIcon />, url: '/', status: true },
-        { title: 'Department', icon: <BadgeIcon />, url: '/team', status: false },
+        { title: 'Team', icon: <BadgeIcon />, url: '/team', status: false },
     ]
     return data
 }
@@ -77,6 +84,8 @@ export default function Team() {
     const showSnackbar = useSnackbar()
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [pageModal, setPageModal] = useState(0)
+    const [rowsPerPageModal, setRowsPerPageModal] = useState(10)
     const [open, setOpen] = useState(false)
     const [openTeam, setOpenTeam] = useState(false)
     const [openConfirm, setOpenConfirm] = useState(false)
@@ -88,7 +97,7 @@ export default function Team() {
     const [arrTeam, setArrTeam] = useState([{ id: 1, email: '', team: [{ name: '', role: '' }] }])
     //setting redux
     const { EmployeeList } = useSelector((state) => state.employee)
-    const { DepartmentList } = useSelector((state) => state.department)
+    const { DepartmentList, DepartmentDetail } = useSelector((state) => state.department)
     const dispatch = useDispatch()
     useEffect(() => {
         dispatch(getDepartmentAsyncApi())
@@ -109,33 +118,37 @@ export default function Team() {
             //   managerName: Yup.string().min(5, 'Too Short!').max(4000, 'Too Long!').required(),
         }),
         onSubmit: (values) => {
+            setLoadingButton(true)
             if (isAction == 1) {
                 setLoadingButton(true)
                 const body = {
                     //   managerId: values.managerName,
                     name: values.name,
                 }
-                dispatch(PostDepartmentAsyncApi(body)).then((response) => {
-                    if (response.meta.requestStatus == 'fulfilled') {
-                        setLoadingButton(false)
+                dispatch(PostDepartmentAsyncApi(body))
+                    .then((response) => {
+                        if (response.meta.requestStatus == 'fulfilled') {
+                            setLoadingButton(false)
 
-                        dispatch(getDepartmentAsyncApi())
-                        showSnackbar({
-                            severity: 'success',
-                            children: 'Add successfully',
-                        })
-                        setOpen(false)
-                        setIsAction(0)
-                        setIdDelete()
-                        formik.setTouched({})
-                        formik.setErrors({})
-                        formik.setValues({
-                            name: '',
-                            managerName: '',
-                        })
-                    }
-                })
-                setLoadingButton(false).catch((error) => {})
+                            dispatch(getDepartmentAsyncApi())
+                            showSnackbar({
+                                severity: 'success',
+                                children: 'Add successfully',
+                            })
+                            setOpen(false)
+                            setIsAction(0)
+                            setIdDelete()
+                            formik.setTouched({})
+                            formik.setErrors({})
+                            formik.setValues({
+                                name: '',
+                                managerName: '',
+                            })
+                        }
+                    })
+                    .catch((error) => {
+                        setLoadingButton(false)
+                    })
             } else if (isAction == 2) {
                 setLoadingButton(true)
 
@@ -181,6 +194,13 @@ export default function Team() {
         setRowsPerPage(+event.target.value)
         setPage(0)
     }
+    const handleChangePageModal = (newPage) => {
+        setPageModal(newPage)
+    }
+    const handleChangeRowsPerPageModal = (event) => {
+        setRowsPerPageModal(+event.target.value)
+        setPageModal(0)
+    }
     const callbackSearch = (childData) => {
         setSearch(childData)
     }
@@ -196,6 +216,7 @@ export default function Team() {
     const handleClickOpenUpdate = (data) => {
         setOpen(true)
         setIsAction(2)
+        dispatch(getDepartmentByIdAsyncApi(data.id)).then((res) => {})
         console.log('data', data)
         formik.setValues({
             name: data.name,
@@ -253,6 +274,22 @@ export default function Team() {
             })
             .catch((error) => {})
     }
+    const createRowsModal = () => {
+        return DepartmentDetail.map((item, index) => ({
+            ...item,
+
+            info: (
+                <div className="flex gap-2 items-center ">
+                    {' '}
+                    {/* Added the class 'align-center' for centering */}
+                    <p className="font-bold">{item.firstName + ' ' + item.lastName}</p>
+                </div>
+            ),
+            email: item.email,
+            number: index + 1,
+        }))
+    }
+    const rowsModal = createRowsModal()
     const viewModalContent = (
         <Fragment>
             <form onSubmit={formik.handleSubmit}>
@@ -274,7 +311,17 @@ export default function Team() {
                             <div className="text mt-1 text-red-600 font-semibold">{formik.errors.name}</div>
                         )}
                     </div>
-
+                    {isAction == 2 && (
+                        <TableData
+                            tableHeight={220}
+                            rows={rowsModal}
+                            columns={columnsModal}
+                            page={pageModal}
+                            rowsPerPage={rowsPerPageModal}
+                            handleChangePage={handleChangePageModal}
+                            handleChangeRowsPerPage={handleChangeRowsPerPageModal}
+                        />
+                    )}
                     {/* <div className="my-2">
                         <FormControl fullWidth>
                             <InputLabel size="small" id="demo-simple-select-label">
@@ -313,12 +360,12 @@ export default function Team() {
                             Cancel
                         </Button>
                         <LoadingButton
-                            type="submit"
                             startIcon={<AddIcon />}
+                            type="submit"
                             loading={loadingButton}
                             loadingPosition="start"
+                            color="info"
                             variant="contained"
-                            color="primary"
                             sx={{
                                 textAlign: 'center',
                             }}
@@ -366,6 +413,7 @@ export default function Team() {
         }))
     }
     const rows = createRows()
+
     console.log('search', search)
     return (
         <div>
@@ -374,13 +422,13 @@ export default function Team() {
             <PopupData
                 open={open}
                 clickOpenFalse={clickOpenFalse}
-                viewTitle={isAction == 1 ? 'Add Department' : isAction == 2 ? 'Update Department' : ''}
+                viewTitle={isAction == 1 ? 'Add Team' : isAction == 2 ? 'Update Team' : ''}
                 viewContent={viewModalContent}
             />
 
             <div className="sm:ml-64 pt-20 h-screen bg-gray-50">
                 <div className="px-12 py-6">
-                    <h2 className="font-bold text-3xl mb-4"> Department List </h2>
+                    <h2 className="font-bold text-3xl mb-4"> Team List </h2>
                     <div className="w-full mb-8 flex font-semibold items-center">
                         <IconBreadcrumbs data={dataBreadcrumbs} />
                         <div className="ml-auto flex gap-5 uppercase">
@@ -391,7 +439,7 @@ export default function Team() {
                                 color="primary"
                                 className=""
                             >
-                                Add New Department
+                                Add New Team
                             </Button>
                         </div>
                     </div>

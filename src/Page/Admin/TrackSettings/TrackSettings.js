@@ -262,36 +262,31 @@ export default function TrackSettings() {
             }
         })
     }
-    const handleClickChangeTime = () => {
-        console.log('sada1', dateStatus)
-        const body = {
-            id: timeSetting.id,
-            fromHourMorning: FormatDateToTime(selectedStartTimeMorning),
-            toHourMorning: FormatDateToTime(selectedEndTimeMorning),
-            fromHourAfternoon: FormatDateToTime(selectedStartTimeAfternoon),
-            toHourAfternoon: FormatDateToTime(selectedEndTimeAfternoon),
-            isDeleted: false,
-        }
-        dispatch(putTimeSettingAsyncApi(body)).then((res) => {
-            if (res.meta.requestStatus == 'fulfilled') {
-                showSnackbar({
-                    severity: 'success',
-                    children: 'Change Time Setting successfully',
-                })
-                dispatch(getTimeSettingAsyncApi(Department)).then((resTime) => {
-                    console.log('ngu', resTime.payload)
-                    const startTimeMorning = formatTimeToDate(resTime.payload.fromHourMorning)
-                    const endTimeMorning = formatTimeToDate(resTime.payload.toHourMorning)
-                    const startTimeAfternoon = formatTimeToDate(resTime.payload.fromHourAfternoon)
-                    const endTimeAfternoon = formatTimeToDate(resTime.payload.toHourAfternoon)
+    function convertTimeToHours(time) {
+        const [hours, minutes] = time.split(':')
+        return parseInt(hours) + parseInt(minutes) / 60
+    }
 
-                    setSelectedStartTimeMorning(startTimeMorning)
-                    setSelectedEndTimeMorning(endTimeMorning)
-                    setSelectedStartTimeAfternoon(startTimeAfternoon)
-                    setSelectedEndTimeAfternoon(endTimeAfternoon)
-                })
-            }
-        })
+    const handleClickChangeTime = () => {
+        const timeDifferenceMilliseconds =
+            selectedEndTimeMorning - selectedStartTimeMorning + (selectedEndTimeAfternoon - selectedStartTimeAfternoon)
+        const valid = timeDifferenceMilliseconds - 8 * 60 * 60 * 1000
+        const newvalid = Math.floor(valid / (1000 * 60 * 60))
+        const hours = Math.floor(timeDifferenceMilliseconds / (1000 * 60 * 60))
+        const minutes = Math.floor((timeDifferenceMilliseconds % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((timeDifferenceMilliseconds % (1000 * 60)) / 1000)
+        console.log('sada1', hours, minutes, seconds)
+        if (valid >= 0) {
+            showSnackbar({
+                severity: 'error',
+                children: 'Time Working < 8:00',
+            })
+        } else {
+            showSnackbar({
+                severity: 'error',
+                children: 'Total Time Working < 8',
+            })
+        }
     }
     const handleClickDelete = () => {}
     // const createRows = () => {

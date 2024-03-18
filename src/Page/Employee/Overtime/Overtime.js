@@ -19,7 +19,7 @@ import { storage } from '../../../Config/FirebaseConfig'
 
 //Mui
 import { styled } from '@mui/system'
-import { Popover, Select, Button, Tooltip, IconButton, TextField } from '@mui/material'
+import { Popover, Select, Button, Tooltip, IconButton, TextField, DialogActions } from '@mui/material'
 import { LoadingButton } from '@mui/lab'
 
 //Icon
@@ -60,6 +60,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { useSnackbar } from '../../../Hook/useSnackbar'
 import TableLoadData from '../../../Components/TableLoad'
+import PopupAlert from '../../../Components/PopupAlert'
+import { DatePicker } from '@mui/x-date-pickers'
 
 const CustomSelect = styled(Select)`
     color: #60a5fa; // Đổi màu chữ thành xanh
@@ -99,13 +101,22 @@ export default function Overtime() {
     const [loadingButton, setLoadingButton] = useState(false)
     //popover
     const [anchorEl, setAnchorEl] = React.useState(null)
-
+    const today = new Date()
+    const threeDaysLater = addDays(today, 3)
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget)
         setIsAction(1)
+        const startTime = formatTimeToDate('18:00')
+        const endTime = formatTimeToDate('20:00')
+
+        setSelectedStartTime(startTime)
+        setSelectedEndTime(endTime)
+
+        setDate(threeDaysLater)
     }
     const showSnackbar = useSnackbar()
-
+    const [errorEdit, SetErrorEdit] = useState(false)
+    const [openAlert, setOpenAlert] = useState(false)
     const [error, SetError] = useState()
     const [errorImport, seterrorImport] = useState(false)
     const [chosenFileName, setChosenFileName] = useState('Chosen file')
@@ -123,7 +134,6 @@ export default function Overtime() {
     const [IdRequest, setIdRequest] = useState()
     const [reason, setReason] = useState('')
     const [leaveDaysDate, setLeaveDaysDate] = useState([])
-    const today = new Date()
     const [date, setDate] = useState(null)
     const DaysLater = addDays(today, 2)
     const [click, SetClick] = useState(false)
@@ -161,6 +171,9 @@ export default function Overtime() {
         setIsAction(1)
     }
     const handleClickOpenUpdate = (data, event) => {
+        if (data.statusRequest != 0) {
+            SetErrorEdit(true)
+        }
         setIdRequest(data.id)
         setAnchorEl(event.currentTarget)
         setOpen(true)
@@ -203,9 +216,21 @@ export default function Overtime() {
     const clickOpenFalseConfirm = (event) => {
         setOpenConfirm(false)
     }
+    const handleClickOpenAlert = () => {
+        setOpenAlert(true)
+    }
+
+    const clickOpenFalseAlert = (event) => {
+        setOpenAlert(false)
+    }
     const handleClickSave = () => {
         setOpen(false)
     }
+    const [selectedDate, setSelectedDate] = useState(null);
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    };
     console.log('mn', selectedStartTime)
     const handleRequest = () => {
         console.log('chay new')
@@ -214,8 +239,8 @@ export default function Overtime() {
         // const parsedDate = parse(date, 'dd MMM, yyyy', new Date())
         // const formattedDateStr = format(parsedDate, 'yyyy/MM/dd')
         const newDate = formatDateExact(date)
-        const timeStart = FormatDateToTime(selectedStartTime)
-        const endTime = FormatDateToTime(selectedEndTime)
+        const timeStart = FormatDateToTime(selectedDate)
+        const endTime = FormatDateToTime(selectedDate)
         const storageRef = ref(storage, `Package/${selectedImage.name}`)
         const uploadTask = uploadBytesResumable(storageRef, selectedImage)
         console.log('mnr', formatDateExact(date), selectedStartTime, timeStart)
@@ -241,10 +266,10 @@ export default function Overtime() {
                     dispatch(PostOvertimeAsyncApi({ id: employeeId, body: body }))
                         .then((response) => {
                             console.log('Response', response.meta.requestStatus == 'fulfilled')
+
                             if (response.meta.requestStatus == 'fulfilled') {
                                 setAnchorEl(null)
                                 setLoadingButton(false)
-
                                 showSnackbar({
                                     severity: 'success',
                                     children: 'Request Successfully',
@@ -256,8 +281,12 @@ export default function Overtime() {
                                 setDate()
                                 setReason()
                                 setSelectedImage()
+                                setSelectedDate()
                                 dispatch(getOvertimeByIdAsyncApi(employeeId))
                                 SetClick(false)
+                            }
+                            if (response.meta.requestStatus == 'reject') {
+                                setLoadingButton(false)
                             }
                         })
                         .catch((err) => {
@@ -378,8 +407,10 @@ export default function Overtime() {
         setDate()
         setReason()
         setSelectedImage()
-        dispatch(getOvertimeByIdAsyncApi(employeeId))
+        SetErrorEdit(false)
         SetClick(false)
+        SetError()
+        seterrorImport(false)
     }
     const createRows = () => {
         const data = [
@@ -429,7 +460,7 @@ export default function Overtime() {
                     <button className="bg-green-300 w-32 text-green-600 font-semibold py-1 px-2 rounded-xl">
                         Approved
                     </button>
-                ) : item.status == 'Reject' ? (
+                ) : item.status == 'Rejected' ? (
                     <button className="bg-red-300  w-32 font-semibold py-1 px-2 rounded-xl">Reject</button>
                 ) : (
                     <button className="bg-orange-300  w-32 font-semibold py-1 px-2 rounded-xl">Pending</button>
@@ -442,8 +473,8 @@ export default function Overtime() {
                             <EditIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip onClick={handleClickOpenConfirm} title="Delete">
-                        <IconButton>
+                    <Tooltip title="Delete">
+                        <IconButton onClick={item.statusRequest == 0 ? handleClickOpenConfirm : handleClickOpenAlert}>
                             <DeleteIcon />
                         </IconButton>
                     </Tooltip>
@@ -453,11 +484,159 @@ export default function Overtime() {
     }
     const rows = createRows()
     console.log('search', search)
+    const minTime = new Date()
+    minTime.setHours(17, 30) // 5:30 PM
+    const maxTime = new Date()
+    maxTime.setHours(22, 30) // 10:30 PM
+   
+    console.log("selectedDate", selectedDate)
+    const viewModalContent = (
+        <Fragment>
+            <div className="">
+                <div className="mx-2 flex flex-col items-center justify-center">
+                    <div className="mb-2">
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={['DatePicker']}>
+                                <DatePicker
+                                    label={
+                                        <span>
+                                            Registration Date <span style={{ color: 'red' }}>*</span>
+                                        </span>
+                                    }
+                                    value={selectedDate}
+                                    onChange={handleDateChange}
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                    </div>
+                    <div className="mb-2">
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <DemoContainer components={['TimePicker']}>
+                                <TimePicker
+                                      label={
+                                        <span>
+                                            Start Time <span style={{ color: 'red' }}>*</span>
+                                        </span>
+                                    }
+                                    slotProps={{ textField: { size: 'small', readOnly: true } }}
+                                    value={selectedStartTime}
+                                    onChange={handleChangeStartTime}
+                                    minTime={minTime}
+                                    maxTime={selectedEndTime || maxTime} // Để ngăn người dùng chọn thời gian kết thúc trước thời gian bắt đầu
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                    </div>
+                    <div className="mb-2">
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <DemoContainer components={['TimePicker']}>
+                                <TimePicker
+                                     label={
+                                        <span>
+                                            End Time <span style={{ color: 'red' }}>*</span>
+                                        </span>
+                                    }
+                                    slotProps={{ textField: { size: 'small', readOnly: true } }}
+                                    value={selectedEndTime}
+                                    onChange={handleChangeEndTime}
+                                    minTime={selectedStartTime || minTime} // Để ngăn người dùng chọn thời gian kết thúc trước thời gian bắt đầu
+                                    maxTime={maxTime}
+                                />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                    </div>
+
+                    <div className="mb-2">
+                        <TextField
+                            onChange={(e) => setReason(e.target.value)}
+                            label={
+                                <span>
+                                    Reason <span style={{ color: 'red' }}>*</span>
+                                </span>
+                            }
+                            multiline
+                            className="w-[260px]"
+                            rows={3}
+                            value={reason}
+                        />
+                    </div>
+                    <div className="mb-2 relative">
+                        <input
+                            className="hidden w-full" // Ẩn input mặc định
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileInputChange}
+                        />
+                        <button
+                            onClick={handleBrowseButtonClick}
+                            className="border-[1px] cursor-pointer rounded-md h-10 bg-gray-300 px-4 absolute "
+                        >
+                            Browse
+                        </button>
+                        <div>
+                            <button
+                                onClick={handleBrowseButtonClick}
+                                className="cursor-pointer  block rounded-md h-10 text-left w-[260px] pl-[90px] font-medium text-gray-600  border border-gray-300   bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                                variant="contained"
+                            >
+                                {chosenFileName.length > 16
+                                    ? chosenFileName.slice(0, 16).concat('...')
+                                    : chosenFileName}
+                            </button>
+                            {error && <div className="text-red-500 w-[260px]">{error}</div>}
+                            {isAction == 2 && (
+                                <a
+                                    className="mt-2 text-blue-400 underline"
+                                    href={chosenFileName}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    Link
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="">
+                <hr />
+                <DialogActions>
+                    <div className=" float-right mr-4">
+                        <LoadingButton
+                            onClick={() =>
+                                isAction == 1 ? handleRequest() : isAction == 2 ? handleRequestUpdate() : null
+                            }
+                            startIcon={<AddIcon />}
+                            disabled={error || !errorImport || errorEdit}
+                            loading={loadingButton}
+                            loadingPosition="start"
+                            variant="contained"
+                            color="primary"
+                            sx={{
+                                textAlign: 'center',
+                            }}
+                            autoFocus
+                        >
+                            Save changes
+                        </LoadingButton>
+                    </div>
+                </DialogActions>
+            </div>
+        </Fragment>
+    )
     return (
         <div>
             <Navbar />
             <PopupConfirm open={openConfirm} clickOpenFalse={clickOpenFalseConfirm} />
-            {openPopover && (
+            <PopupAlert open={openAlert} clickOpenFalse={clickOpenFalseAlert} />
+            <PopupData
+                open={openPopover}
+                clickOpenFalse={handleClose}
+                viewTitle={isAction == 1 ? 'Apply Overtime' : isAction == 2 ? 'Edit Overtime' : ''}
+                viewContent={viewModalContent}
+                size="sm"
+            />
+            {/* {openPopover && (
                 <Popover
                     id={id}
                     open={openPopover}
@@ -468,106 +647,9 @@ export default function Overtime() {
                         horizontal: 'left',
                     }}
                 >
-                    <div className="md:flex">
-                        <Calendar onChange={(item) => setDate(item)} date={date} minDate={DaysLater} />
-                        <div className="mx-2 flex flex-col items-center justify-center">
-                            <div className="mb-2">
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DemoContainer components={['TimePicker']}>
-                                        <TimePicker
-                                            label="Start Time"
-                                            slotProps={{ textField: { size: 'small' } }}
-                                            value={selectedStartTime}
-                                            onChange={handleChangeStartTime}
-                                        />
-                                    </DemoContainer>
-                                </LocalizationProvider>
-                            </div>
-                            <div className="mb-2">
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DemoContainer components={['TimePicker']}>
-                                        <TimePicker
-                                            label="End Time"
-                                            slotProps={{ textField: { size: 'small' } }}
-                                            value={selectedEndTime}
-                                            onChange={handleChangeEndTime}
-                                        />
-                                    </DemoContainer>
-                                </LocalizationProvider>
-                            </div>
-
-                            <div className="mb-2">
-                                <TextField
-                                    onChange={(e) => setReason(e.target.value)}
-                                    label="Reason"
-                                    multiline
-                                    className="w-[260px]"
-                                    rows={3}
-                                    value={reason}
-                                />
-                            </div>
-                            <div className="mb-2 relative">
-                                <input
-                                    className="hidden w-full" // Ẩn input mặc định
-                                    type="file"
-                                    ref={fileInputRef}
-                                    onChange={handleFileInputChange}
-                                />
-                                <button
-                                    onClick={handleBrowseButtonClick}
-                                    className="border-[1px] cursor-pointer rounded-md h-10 bg-gray-300 px-4 absolute "
-                                >
-                                    Browse
-                                </button>
-                                <div>
-                                    <button
-                                        onClick={handleBrowseButtonClick}
-                                        className="cursor-pointer  block rounded-md h-10 text-left w-[260px] pl-[90px] font-medium text-gray-600  border border-gray-300   bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                                        fullWidth
-                                        variant="contained"
-                                    >
-                                        {chosenFileName.length > 16
-                                            ? chosenFileName.slice(0, 16).concat('...')
-                                            : chosenFileName}
-                                    </button>
-                                    {error && <div className="text-red-500 w-[260px]">{error}</div>}
-                                    {isAction == 2 && (
-                                        <a
-                                            className="mt-2 text-blue-400 underline"
-                                            href={chosenFileName}
-                                            target="_blank"
-                                        >
-                                            Link
-                                        </a>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="">
-                        <hr />
-                        <div className="my-2 float-right mr-4">
-                            <LoadingButton
-                                onClick={() =>
-                                    isAction == 1 ? handleRequest() : isAction == 2 ? handleRequestUpdate() : null
-                                }
-                                startIcon={<AddIcon />}
-                                disabled={error || !errorImport}
-                                loading={loadingButton}
-                                loadingPosition="start"
-                                variant="contained"
-                                color="primary"
-                                sx={{
-                                    textAlign: 'center',
-                                }}
-                                autoFocus
-                            >
-                                Save changes
-                            </LoadingButton>
-                        </div>
-                    </div>
+                    
                 </Popover>
-            )}
+            )} */}
             <div className="sm:ml-64 pt-20 h-screen bg-gray-50">
                 <div className="px-12 py-6">
                     <h2 className="font-bold text-3xl mb-4"> Request Overtime List </h2>

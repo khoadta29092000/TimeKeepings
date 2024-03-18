@@ -104,8 +104,15 @@ function Login() {
     })
 
     return (
-        <div className="md:grid grid-cols-2 bg-gray-50">
-            <div className="md:shadow-2xl md:border-[1px] bg-[url('https://data.designervn.net/2019/09/9676_3c1b0f70d986fd4e324cb43331b33b81.png')]  m-12 rounded-2xl grid grid-rows-3 "></div>
+        <div className="md:grid grid-cols-2 h-full bg-gray-50">
+            <div className=" hidden md:flex justify-center items-center m-12">
+                <div className="mx-auto  md:shadow-2xl h-2/3 md:border-[1px]  rounded-2xl ">
+                    <img
+                        src="https://www.softactivity.com/wp-content/uploads/Employee-Time-Tracking-1400.jpg?fbclid=IwAR0XE9c9ARxM-7LdxPdl-pN0JAVXmeEzCVYsfAKbP8sJhTyMBN8t4x-9T4M"
+                        alt="Ảnh"
+                    />
+                </div>
+            </div>
             <section className="bg-gray-50 dark:bg-gray-900 ">
                 <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                     <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
@@ -151,7 +158,7 @@ function Login() {
                                     required=""
                                 />
                             </div>
-                            <div className="flex items-center justify-between">
+                            {/* <div className="flex items-center justify-between">
                                 <div className="flex items-start">
                                     <div className="flex items-center h-5">
                                         <input
@@ -174,7 +181,7 @@ function Login() {
                                 >
                                     Forgot password?
                                 </Link>
-                            </div>
+                            </div> */}
                             <LoadingButton
                                 onClick={handleSubmit}
                                 loading={loadingButton}

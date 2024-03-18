@@ -64,7 +64,7 @@ const columns = [
     { id: 'info', label: 'Name', minWidth: 200, align: 'left' },
     { id: 'roleName', label: 'Role', minWidth: 250, align: 'left' },
     { id: 'departmentName', label: 'Team', minWidth: 250, align: 'left' },
-
+    // { id: 'type', label: 'Type', minWidth: 250, align: 'left' },
     { id: 'status', label: 'Status', minWidth: 50, align: 'center' },
     { id: 'action', label: 'Actions', minWidth: 50, align: 'center' },
 ]
@@ -330,7 +330,7 @@ export default function EmployeeAdmin() {
                         severity: 'success',
                         children: 'Delete Employee successfully',
                     })
-                    dispatch(getEmployeeAsyncApi())
+                    dispatch(getEmployeeAsyncApi({ roleId: '', departmentId: '', name: search }))
                 }
             })
             .catch((error) => {
@@ -709,7 +709,7 @@ export default function EmployeeAdmin() {
             </DialogActions>
         </Fragment>
     )
-    const createRows = () => {
+    const createRows = () => {  
         return EmployeeList.map((item, index) => ({
             ...item,
             email: (
@@ -735,7 +735,7 @@ export default function EmployeeAdmin() {
                             <VisibilityIcon />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip onClick={() => handleClickOpenConfirm(item.employeeId)} title="Delete">
+                    <Tooltip onClick={() => handleClickOpenConfirm(item.id)} title="Delete">
                         <IconButton>
                             <DeleteIcon />
                         </IconButton>

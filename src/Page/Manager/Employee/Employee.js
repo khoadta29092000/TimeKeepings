@@ -97,7 +97,7 @@ export default function Employee() {
             action: (
                 <div className="flex gap-2 justify-center">
                     <NavLink
-                        to={`/Employee/Detail/${item.employeeId}`}
+                        to={`/Manager/Employee/Detail/${item.id}`}
                         activeStyle={{
                             background: '#dbeafe',
                             color: '#2563eb',

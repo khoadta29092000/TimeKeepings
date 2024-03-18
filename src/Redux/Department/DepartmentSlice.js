@@ -10,7 +10,7 @@ import GetDepartmentApi, {
 const initialState = {
     DepartmentList: [],
     DepartmentWithoutList: [],
-    DepartmentDetail: {},
+    DepartmentDetail: [],
 }
 
 const authSlice = createSlice({
@@ -18,7 +18,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         clearDepartment: (state, action) => {
-            state.DepartmentDetail = {}
+            state.DepartmentDetail = []
             state.DepartmentList = []
             state.DepartmentWithoutList = []
         },
